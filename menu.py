@@ -18,11 +18,13 @@ def menu():
 
         elif opt == "2":
             cliente = cargarCliente("guardado")
-            log.escribir("INFO", f"CONSULTA DATOS CLIENTE CON NÚMERO: {cliente.numero}")
             if cliente is not None:
+                log.escribir("INFO", f"CONSULTA DATOS CLIENTE CON NÚMERO: {cliente.numero}")
                 print(f"Cliente: {cliente.numero}")
                 print(f"Saldo cuenta: {cliente.cuenta.saldo} €")
                 print(f"Saldo depósito: {cliente.deposito.saldo} €")
+            else:
+                print("No se puede mostrar la consulta de ese cliente")
 
         elif opt == "3":
             log.escribir(
