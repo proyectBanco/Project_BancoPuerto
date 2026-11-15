@@ -104,10 +104,10 @@ def cargarClienteGuardado(numCliente):
     try:
         with open(f"datosClientes/{numCliente}.txt", "r") as f:
 
-            datos = f.read().split(";")
-
-            cliente = Cliente(datos[0])
-
+            datos = f.read().splitlines()
+            
+            cliente = Cliente(datos[0].strip())
+            
             cliente.cuenta.saldo = float(datos[1])
             cliente.deposito.saldo = float(datos[2])
 
@@ -120,6 +120,14 @@ def cargarClienteGuardado(numCliente):
             f"INTENTO DE CONSULTA DEL CLIENTE {numCliente} QUE NO HA SIDO CARGADO"
         )
         return None
+    
+    except (ValueError, IndexError):
+            print("Los datos guardados del cliente no son válidos. Vuelve a cargar sus datos (opción 1)")
+            log.escribir(
+                "ERROR",
+                f"FORMATO INCORRECTO EN datosClientes/{numCliente}.txt"
+            )
+            return None
     
 def listarClientes():
     if not os.path.exists("datosClientes"):
