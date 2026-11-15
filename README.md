@@ -86,7 +86,8 @@ bancoPuertollano2027/
 ```text
 1) Cargar Datos Cliente
 2) Consultar cuenta Deposito
-3) Salir
+3) Listar clientes cargados
+4) Salir
 ```
 
 ## 📝 Logs

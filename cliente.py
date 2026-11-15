@@ -1,3 +1,5 @@
+import os
+
 from models import Cliente
 from logs import Log
 
@@ -20,44 +22,80 @@ def cargarCliente(tipo):
 
 def leerFichero(numCliente):
 
+    log.escribir("INFO", f"INICIO CARGA DEL CLIENTE {numCliente}")
+
     cliente = Cliente(numCliente)
+
+    movimientosProcesados = 0
 
     try:
         with open(f"ficherosClientes/{numCliente}.txt", "r") as f:
 
-            linea = f.readline()
+            for numLinea, linea in enumerate(f, start=1):
 
-            while linea:
+                for grupo in linea.strip().split():
 
-                datos = linea.strip().split(";")
+                    datos = grupo.split(";")
 
-                cantidad = float(datos[0])
-                operacion = datos[1]
-                destino = datos[2]
+                    try:
+                        cantidad = float(datos[0])
+                        operacion = datos[1]
+                        destino = datos[2]
+                    except (ValueError, IndexError):
+                        log.escribir(
+                            "ERROR",
+                            f"CLIENTE {numCliente}: LÍNEA {numLinea} INCORRECTA, "
+                            f"SE IGNORA EL MOVIMIENTO -> '{grupo}'"
+                        )
+                        continue
 
-                if destino == "Cuenta" and operacion == "Ingreso":
-                    cliente.cuenta.ingresar(cantidad)
+                    if destino == "Cuenta" and operacion == "Ingreso":
+                        cliente.cuenta.ingresar(cantidad)
 
-                elif destino == "Cuenta" and operacion == "Retirada":
-                    cliente.cuenta.retirar(cantidad)
+                    elif destino == "Cuenta" and operacion == "Retirada":
+                        cliente.cuenta.retirar(cantidad)
 
-                elif destino == "Deposito" and operacion == "Ingreso":
-                    cliente.deposito.ingresar(cantidad)
+                    elif destino == "Deposito" and operacion == "Ingreso":
+                        cliente.deposito.ingresar(cantidad)
 
-                elif destino == "Deposito" and operacion == "Retirada":
-                    cliente.deposito.retirar(cantidad)
+                    elif destino == "Deposito" and operacion == "Retirada":
+                        cliente.deposito.retirar(cantidad)
 
-                linea = f.readline()
+                    else:
+                        log.escribir(
+                            "WARNING",
+                            f"CLIENTE {numCliente}: LÍNEA {numLinea} CON OPERACIÓN O DESTINO "
+                            f"DESCONOCIDO, NO SE REALIZA -> '{grupo}'"
+                        )
+                        continue
+
+                    movimientosProcesados += 1
 
         # Guardamos el estado final del cliente
         cliente.guardar()
 
         print("Datos del cliente cargados correctamente")
 
+        log.escribir("INFO", f"CLIENTE {numCliente} CARGADO CORRECTAMENTE")
+
+        print(f"Movimientos procesados: {movimientosProcesados}")
+        log.escribir(
+            "INFO",
+            f"CLIENTE {numCliente}: MOVIMIENTOS PROCESADOS: {movimientosProcesados}"
+        )
+
+        print(f"Cliente: {cliente.getNumero()}")
+        print(f"Saldo cuenta: {cliente.getCuenta().getSaldo()} €")
+        print(f"Saldo depósito: {cliente.getDeposito().getSaldo()} €")
+
         return cliente
 
     except FileNotFoundError:
         print("El usuario no tiene ninguna cuenta con el banco")
+        log.escribir(
+            "ERROR",
+            f"NO EXISTE EL FICHERO DE MOVIMIENTOS DEL CLIENTE {numCliente}"
+        )
         return None
 
 
@@ -66,11 +104,10 @@ def cargarClienteGuardado(numCliente):
     try:
         with open(f"datosClientes/{numCliente}.txt", "r") as f:
 
-            linea = f.readline()
-            datos = linea.split(";")
-
-            cliente = Cliente(datos[0])
-
+            datos = f.read().splitlines()
+            
+            cliente = Cliente(datos[0].strip())
+            
             cliente.cuenta.saldo = float(datos[1])
             cliente.deposito.saldo = float(datos[2])
 
@@ -78,4 +115,27 @@ def cargarClienteGuardado(numCliente):
 
     except FileNotFoundError:
         print("Primero tienes que cargar los datos de este cliente")
+        log.escribir(
+            "ERROR",
+            f"INTENTO DE CONSULTA DEL CLIENTE {numCliente} QUE NO HA SIDO CARGADO"
+        )
         return None
+    
+    except (ValueError, IndexError):
+            print("Los datos guardados del cliente no son válidos. Vuelve a cargar sus datos (opción 1)")
+            log.escribir(
+                "ERROR",
+                f"FORMATO INCORRECTO EN datosClientes/{numCliente}.txt"
+            )
+            return None
+    
+def listarClientes():
+    if not os.path.exists("datosClientes"):
+        return []
+
+    clientes = []
+    for fichero in os.listdir("datosClientes"):
+        if fichero.endswith(".txt"):
+            clientes.append(fichero[:-4])
+
+    return sorted(clientes)    
