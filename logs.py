@@ -4,6 +4,8 @@ import os
 
 class Log:
 
+    TIPOS_VALIDOS = ("INFO", "WARNING", "ERROR")
+
     def __init__(self):
         fecha = datetime.now().strftime("%Y%m%d")
         self.ruta = f"log/{fecha}-banco.log"
@@ -14,5 +16,9 @@ class Log:
     def escribir(self, tipo, mensaje):
         fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+        tipo = str(tipo).upper()
+        if tipo not in self.TIPOS_VALIDOS:
+            tipo = "INFO"
+
         with open(self.ruta, "a") as fichero:
-            fichero.write(f"[{fecha_hora}] [{tipo.upper()}] {mensaje}\n")
+            fichero.write(f"[{fecha_hora}] [{tipo}] {mensaje}\n")
