@@ -24,6 +24,8 @@ def leerFichero(numCliente):
 
     cliente = Cliente(numCliente)
 
+    movimientosProcesados = 0
+
     try:
         with open(f"ficherosClientes/{numCliente}.txt", "r") as f:
 
@@ -64,12 +66,21 @@ def leerFichero(numCliente):
                             f"DESCONOCIDO, NO SE REALIZA -> '{grupo}'"
                         )
                         continue
-                    
+
+                    movimientosProcesados += 1
+
+        # Guardamos el estado final del cliente
         cliente.guardar()
 
         print("Datos del cliente cargados correctamente")
 
         log.escribir("INFO", f"CLIENTE {numCliente} CARGADO CORRECTAMENTE")
+
+        print(f"Movimientos procesados: {movimientosProcesados}")
+        log.escribir(
+            "INFO",
+            f"CLIENTE {numCliente}: MOVIMIENTOS PROCESADOS: {movimientosProcesados}"
+        )
 
         print(f"Cliente: {cliente.getNumero()}")
         print(f"Saldo cuenta: {cliente.getCuenta().getSaldo()} €")
