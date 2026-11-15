@@ -20,7 +20,6 @@ def cargarCliente(tipo):
 
 def leerFichero(numCliente):
 
-    # Añadido para Tarea 2: registrar el inicio de la carga
     log.escribir("INFO", f"INICIO CARGA DEL CLIENTE {numCliente}")
 
     cliente = Cliente(numCliente)
@@ -58,6 +57,14 @@ def leerFichero(numCliente):
                     elif destino == "Deposito" and operacion == "Retirada":
                         cliente.deposito.retirar(cantidad)
 
+                    else:
+                        log.escribir(
+                            "WARNING",
+                            f"CLIENTE {numCliente}: LÍNEA {numLinea} CON OPERACIÓN O DESTINO "
+                            f"DESCONOCIDO, NO SE REALIZA -> '{grupo}'"
+                        )
+                        continue
+                    
         cliente.guardar()
 
         print("Datos del cliente cargados correctamente")
