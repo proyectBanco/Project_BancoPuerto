@@ -1,3 +1,5 @@
+import os
+
 from models import Cliente
 from logs import Log
 
@@ -118,3 +120,14 @@ def cargarClienteGuardado(numCliente):
             f"INTENTO DE CONSULTA DEL CLIENTE {numCliente} QUE NO HA SIDO CARGADO"
         )
         return None
+    
+def listarClientes():
+    if not os.path.exists("datosClientes"):
+        return []
+
+    clientes = []
+    for fichero in os.listdir("datosClientes"):
+        if fichero.endswith(".txt"):
+            clientes.append(fichero[:-4])
+
+    return sorted(clientes)    
