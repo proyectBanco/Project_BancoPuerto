@@ -28,6 +28,7 @@ def leerFichero(numCliente):
         with open(f"ficherosClientes/{numCliente}.txt", "r") as f:
 
             for linea in f:
+
                 for grupo in linea.strip().split():
 
                     datos = grupo.split(";")
@@ -48,12 +49,15 @@ def leerFichero(numCliente):
                     elif destino == "Deposito" and operacion == "Retirada":
                         cliente.deposito.retirar(cantidad)
 
-        # Guardamos el estado final del cliente
         cliente.guardar()
 
         print("Datos del cliente cargados correctamente")
 
         log.escribir("INFO", f"CLIENTE {numCliente} CARGADO CORRECTAMENTE")
+
+        print(f"Cliente: {cliente.getNumero()}")
+        print(f"Saldo cuenta: {cliente.getCuenta().getSaldo()} €")
+        print(f"Saldo depósito: {cliente.getDeposito().getSaldo()} €")
 
         return cliente
 
