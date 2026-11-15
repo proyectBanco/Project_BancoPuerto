@@ -20,6 +20,7 @@ def cargarCliente(tipo):
 
 def leerFichero(numCliente):
 
+    # Añadido para Tarea 2: registrar el inicio de la carga
     log.escribir("INFO", f"INICIO CARGA DEL CLIENTE {numCliente}")
 
     cliente = Cliente(numCliente)
@@ -27,15 +28,23 @@ def leerFichero(numCliente):
     try:
         with open(f"ficherosClientes/{numCliente}.txt", "r") as f:
 
-            for linea in f:
+            for numLinea, linea in enumerate(f, start=1):
 
                 for grupo in linea.strip().split():
 
                     datos = grupo.split(";")
 
-                    cantidad = float(datos[0])
-                    operacion = datos[1]
-                    destino = datos[2]
+                    try:
+                        cantidad = float(datos[0])
+                        operacion = datos[1]
+                        destino = datos[2]
+                    except (ValueError, IndexError):
+                        log.escribir(
+                            "ERROR",
+                            f"CLIENTE {numCliente}: LÍNEA {numLinea} INCORRECTA, "
+                            f"SE IGNORA EL MOVIMIENTO -> '{grupo}'"
+                        )
+                        continue
 
                     if destino == "Cuenta" and operacion == "Ingreso":
                         cliente.cuenta.ingresar(cantidad)
